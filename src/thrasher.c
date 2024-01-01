@@ -25,8 +25,9 @@ static inline uint64_t access_memory(void* address) {
         "rdtscp\n"              // read the clock
         "movl %%eax, %%esi\n"   // store the values in registers 
         "movl %%edx, %%edi\n"   // so that they don't get clobbered
-
-        "movq (%%r8), %%rax\n"  // do the memory access
+        "andq $31, %%rax\n"     
+        "orq %%rax, %%r8\n"
+        "movq (%%r8), %%rax\n"    
 
         "rdtscp\n"              // read the clock again
         "shlq $32,%%rdx\n"      // shift the hi part of the tsc left by 32 bits
@@ -165,14 +166,14 @@ void* threadFunction(void* args) {
     }
 
     int index = 0;
-    int offset = 0;
+    int offset = 4032;
     long sum = 0;
         for(int i=ti->iterations; i>0; i--) {
         int index = (index + 90001) % ti->num_pages;
         if(index == 0) {
-            offset += 64;
-            if(offset == 4096) {
-                offset = 0;
+            offset -= 64;
+            if(offset == 0) {
+                offset = 4032;
             }
         }
         void *addr = ti->memory[index] + offset;
