@@ -25,12 +25,12 @@ static void access(uint32_t* histogram, size_t histogram_size, uint64_t count) {
         "movq %1, %%r8\n"            // load the address of the histogram
         "movq %2, %%r9\n"            // count iterations
         "loop:\n"
-        "  cli\n"
+//        "  cli\n"
         "  rdtscp\n"                  // read the clock
         "  movl %%eax, %%esi\n"      // store the values in registers 
         "  movl %%edx, %%edi\n"      // so they don't get clobbered
         "  rdtscp\n"                  // read the clock again
-        "  sti\n"                    
+//        "  sti\n"                    
         "  shlq $32,%%rdx\n"         // shift the hi part of the tsc left by 32 bits
         "  movl %%eax, %%eax\n"      // clear the high bits of rax
         "  orq %%rdx, %%rax\n"       // OR them together so that rax contains end time
@@ -56,8 +56,9 @@ static void access(uint32_t* histogram, size_t histogram_size, uint64_t count) {
 int main() {
     uint32_t histogram[64];
    
-    access(histogram, 64, 100000000);
-    access(histogram, 64, 100000000);
+    access(histogram, 64, 1000000000);
+    print_histogram( histogram, 63);
+    access(histogram, 64, 1000000000);
     print_histogram( histogram, 63);
     return 0;
 }
